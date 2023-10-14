@@ -1,7 +1,9 @@
 import copy
 from abc import ABC
 from typing import Any
+from decimal import Decimal
 import numpy as np
+import torch
 
 
 class Mutation(ABC):
@@ -32,11 +34,17 @@ class GaussianMutation(Mutation):
         else:
             pop = population
 
-        if np.random() > self._mut_prob:
+        if np.random.random() > self._mut_prob:
             # Case: Don't do the mutation
             return pop
+
         # Case: Do the mutation
         for ind in pop:
-            noise = np.random.normal(loc=self._mean, scale=self._std)
-            ind += noise
+            for key in ind:
+                if isinstance(ind[key], Decimal):
+                    ind[key] += np.random.normal(loc=self._mean, scale=self._std)
+                elif isinstance(ind[key], np.ndarray) and np.issubdtype(ind[key].dtype, np.float):
+                    ind[key] += np.random.normal(loc=self._mean, scale=self._std, size=ind.shape)
+                elif isinstance(ind[key], torch.Tensor) and torch.is_floating_point(ind[key]):
+                    ind[key] += torch.normal(mean=self._mean, std=self._std, size=ind.size())
         return pop
