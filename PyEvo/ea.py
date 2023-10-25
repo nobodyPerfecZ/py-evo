@@ -115,7 +115,6 @@ class EA:
             # Case: Evaluate the individual in parallel
             pool = multiprocessing.Pool(processes=self._n_cores)
             fitness = pool.map(self._evaluate_config, self._pop)
-        print(f"Fitness: {fitness}")
 
         # Update the cache with the new rewards
         self._update_cache(self._pop, fitness)
@@ -217,7 +216,7 @@ class EA:
 
             if not self._check_n_iter():
                 # Perform selection
-                pop = self._selections.select(self._random, self._pop, fitness, self._optimizer,
+                pop = self._selections.select(self._random, self._cs, self._pop, fitness, self._optimizer,
                                               self._pop_size // self._selection_factor)
 
                 if self._check_walltime_limit():
@@ -227,17 +226,18 @@ class EA:
                 childs_size = self._pop_size - len(pop)
                 childs = pop
                 for crossover in self._crossovers:
-                    childs = crossover.crossover(self._random, self._cs, childs, childs_size)
+                    childs = crossover.crossover(self._random, self._cs, childs, fitness, self._optimizer, childs_size)
 
                 if self._check_walltime_limit():
                     return
 
                 # Perform mutation
                 for mutation in self._mutations:
-                    childs = mutation.mutate(self._random, self._cs, childs)
+                    childs = mutation.mutate(self._random, self._cs, childs, fitness, self._optimizer)
 
                 if self._check_walltime_limit():
                     return
+
                 # Combine childs and selected population to the new population
                 self._pop = pop + childs
             else:

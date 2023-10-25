@@ -45,7 +45,7 @@ class TestElitistSelection(unittest.TestCase):
         """
         Tests the method select() with minimizer.
         """
-        new_pop = self.selector.select(self.random, self.pop, self.fitness, self.optimizer_min, self.n_select)
+        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_select)
 
         self.assertEqual(self.n_select, len(new_pop))
         self.assertEqual(new_pop[0], self.pop[4])
@@ -58,7 +58,7 @@ class TestElitistSelection(unittest.TestCase):
         """
         Tests the method select() with maximizer.
         """
-        new_pop = self.selector.select(self.random, self.pop, self.fitness, self.optimizer_max, self.n_select)
+        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_max, self.n_select)
 
         self.assertEqual(self.n_select, len(new_pop))
         self.assertEqual(new_pop[0], self.pop[6])
@@ -103,7 +103,7 @@ class TestTournamentSelection(unittest.TestCase):
         Tests the method select() with minimizer.
         """
 
-        new_pop = self.selector.select(self.random, self.pop, self.fitness, self.optimizer_min, self.n_select)
+        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_select)
 
         self.assertEqual(self.n_select, len(new_pop))
         self.assertIn(new_pop[0], self.pop)
@@ -116,7 +116,7 @@ class TestTournamentSelection(unittest.TestCase):
         """
         Tests the method select() with maximizer.
         """
-        new_pop = self.selector.select(self.random, self.pop, self.fitness, self.optimizer_max, self.n_select)
+        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_max, self.n_select)
 
         self.assertEqual(self.n_select, len(new_pop))
         self.assertIn(new_pop[0], self.pop)

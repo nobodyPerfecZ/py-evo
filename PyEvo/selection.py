@@ -11,10 +11,12 @@ class Selection(ABC):
     def select(
             self,
             random: np.random.RandomState,
+            cs: HyperparameterConfiguration,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
             n_select: int,
+            **kwargs,
     ) -> list[HyperparameterConfiguration]:
         """
         Choose from the population new individuals to be selected for the next generation.
@@ -22,6 +24,9 @@ class Selection(ABC):
         Args:
             random (np.random.RandomState):
                 The random generator for the sampling procedure
+
+            cs (HyperparameterConfigurationSpace):
+                configuration space from where we manage our hyperparameters (individuals)
 
             pop (list[HyperparameterConfiguration]):
                 The population which should be selected from
@@ -37,11 +42,19 @@ class Selection(ABC):
             n_select (int):
                 Number of individuals to select from the population
 
+            **kwargs (dict):
+                additional parameters for the function
+
         Returns:
             list[HyperparameterConfiguration]:
                 The individuals that are selected for the next generation
         """
-        assert 2 <= len(pop), f"Illegal population {pop}. The length of the population should be 2 <= len(pop)!"
+        # Check if each individual in population has all hyperparameters from the configuration space
+        assert all(key in p for p in pop for key in cs), \
+            f"Invalid Hyperparameter Configuration. Some Hyperparameters not found!"
+
+        assert 2 <= len(pop), \
+            f"Illegal population {pop}. The length of the population should be 2 <= len(pop)!"
 
         assert len(pop) == len(fitness), \
             "Illegal population and fitness. Each individual should be assigned to a fitness value!"
@@ -52,16 +65,18 @@ class Selection(ABC):
         assert 1 <= n_select <= len(pop), \
             f"Illegal n_select {n_select}. It should be in between 1 <= n_select <= len(pop)!"
 
-        return self._select(random, copy.deepcopy(pop), copy.deepcopy(fitness), optimizer, n_select)
+        return self._select(random, cs, copy.deepcopy(pop), copy.deepcopy(fitness), optimizer, n_select, **kwargs)
 
     @abstractmethod
     def _select(
             self,
             random: np.random.RandomState,
+            cs: HyperparameterConfiguration,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
             n_select: int,
+            **kwargs,
     ):
         pass
 
@@ -73,10 +88,12 @@ class ElitistSelection(Selection):
     def _select(
             self,
             random: np.random.RandomState,
+            cs: HyperparameterConfiguration,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
             n_select: int,
+            **kwargs,
     ) -> list[HyperparameterConfiguration]:
         reverse = False if optimizer == "min" else True
         new_pop = sorted(pop, key=lambda key: fitness[pop.index(key)], reverse=reverse)[:n_select]
@@ -92,10 +109,12 @@ class TournamentSelection(Selection):
     def _select(
             self,
             random: np.random.RandomState,
+            cs: HyperparameterConfiguration,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
             n_select: int,
+            **kwargs
     ) -> list[HyperparameterConfiguration]:
         reverse = False if optimizer == "min" else True
         new_pop = []

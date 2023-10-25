@@ -33,6 +33,9 @@ class TestCopyCrossover(unittest.TestCase):
             seed=0,
         )
         self.pop = self.cs.sample_configuration(10)
+        self.fitness = [-92, -17, 22, 56, -96, -20, 76, 29, -48, -56]
+        self.optimizer_min = "min"
+        self.optimizer_max = "max"
         self.n_childs = 10
         self.crossover = CopyCrossover()
 
@@ -40,7 +43,8 @@ class TestCopyCrossover(unittest.TestCase):
         """
         Tests the method crossover().
         """
-        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.n_childs)
+        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.fitness, self.optimizer_min,
+                                              self.n_childs)
 
         self.assertEqual(self.n_childs, len(new_childs))
         self.assertEqual(self.pop, new_childs)
@@ -69,6 +73,9 @@ class TestUniformCrossover(unittest.TestCase):
             seed=0,
         )
         self.pop = self.cs.sample_configuration(10)
+        self.fitness = [-92, -17, 22, 56, -96, -20, 76, 29, -48, -56]
+        self.optimizer_min = "min"
+        self.optimizer_max = "max"
         self.n_childs = 10
         self.crossover = UniformCrossover()
 
@@ -76,7 +83,7 @@ class TestUniformCrossover(unittest.TestCase):
         """
         Tests the method crossover().
         """
-        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.n_childs)
+        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_childs)
 
         self.assertEqual(self.n_childs, len(new_childs))
         self.assertNotEqual(self.pop, new_childs)
@@ -107,6 +114,9 @@ class TestIntermediateCrossover(unittest.TestCase):
             seed=0,
         )
         self.pop = self.cs.sample_configuration(10)
+        self.fitness = [-92, -17, 22, 56, -96, -20, 76, 29, -48, -56]
+        self.optimizer_min = "min"
+        self.optimizer_max = "max"
         self.n_childs = 10
         self.crossover = IntermediateCrossover()
 
@@ -114,7 +124,7 @@ class TestIntermediateCrossover(unittest.TestCase):
         """
         Tests the method crossover().
         """
-        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.n_childs)
+        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_childs)
 
         self.assertEqual(self.n_childs, len(new_childs))
         self.assertNotEqual(self.pop, new_childs)

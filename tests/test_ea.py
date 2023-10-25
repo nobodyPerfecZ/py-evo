@@ -77,7 +77,7 @@ class TestEA(unittest.TestCase):
         """
         Tests the property incumbent.
         """
-        self.EA.incumbent
+        incumbent = self.EA.incumbent
 
         self.assertIsNone(self.EA.incumbent)
 
