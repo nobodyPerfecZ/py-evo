@@ -57,9 +57,9 @@ class EA:
 
         # Necessary for the EA Loop
         self._pop = None
-        self._cache = {}
         self._start_time = None
         self._cur_iter = None
+        self._incumbent = None
 
     def _initialize_population(self) -> list[HyperparameterConfiguration]:
         """
@@ -99,6 +99,20 @@ class EA:
             return used_time >= self._walltime_limit
         return False
 
+    def _update_incumbent(self, fitness: list[float]):
+        """
+        Updates the incumbent by assigning it to the best individual from the current population.
+
+        Args:
+            fitness (list[float]):
+                Fitness values for each individual in population
+        """
+        if self._optimizer == "max":
+            select = max
+        elif self._optimizer == "min":
+            select = min
+        self._incumbent = self._pop[select(range(len(fitness)), key=fitness.__getitem__)]
+
     def _evaluate(self) -> list[float]:
         """
         Evaluates the current population in parallel and returns the fitness values of each individual.
@@ -110,70 +124,25 @@ class EA:
         """
         if self._n_cores == 1:
             # Case: Evaluate with single core
-            fitness = [self._evaluate_config(ind) for ind in self._pop]
+            fitness = [self._problem(ind) for ind in self._pop]
         else:
             # Case: Evaluate the individual in parallel
             pool = multiprocessing.Pool(processes=self._n_cores)
-            fitness = pool.map(self._evaluate_config, self._pop)
+            fitness = pool.map(self._problem, self._pop)
 
         # Update the cache with the new rewards
-        self._update_cache(self._pop, fitness)
-
+        self._update_incumbent(fitness)
         return fitness
-
-    def _evaluate_config(self, cfg: HyperparameterConfiguration) -> float:
-        """
-        Evaluate the given individual fitness value. If the individual was already evaluated before and their fitness
-        value is stored in the cache, then the individual does not get evaluated again, and the fitness value from
-        the cache is returned.
-
-        Args:
-            cfg (HyperparameterConfiguration):
-                The individual you want to evaluate
-
-        Returns:
-            float:
-                fitness value of the given individual
-        """
-        if cfg in self._cache:
-            # Case: individual was already evaluated before
-            return self._cache[cfg]
-        else:
-            # Case: new individual to evaluate
-            return self._problem(cfg)
-
-    def _update_cache(self, pop: list[HyperparameterConfiguration], fitness: list[float]):
-        """
-        Updates the cache with new unseen individuals from the population. If some individuals are already stored in
-        the cache then it will not be updated.
-
-        Args:
-            pop (list[HyperparameterConfiguration]):
-                The population you want to insert into the cache
-
-            fitness (list[float]):
-                The fitness values for each individual in the population
-        """
-        for ind, f in zip(pop, fitness):
-            if ind not in self._cache:
-                self._cache[ind] = f
 
     @property
     def incumbent(self) -> Union[HyperparameterConfiguration, None]:
         """
         Returns:
             Union[HyperparameterConfiguration, None]:
-                Individual with the best fitness value.
-                If no individuals are evaluated before, then it will return None.
+                Individual with the best fitness value. If no individuals are evaluated before, then it will return
+                None.
         """
-        if not self._cache:
-            # Case: Cache is empty
-            return None
-        else:
-            # Case: Find individual with the best fitness value (either min or max)
-            optimizer = min if self._optimizer == "min" else max
-            key = optimizer(self._cache, key=lambda k: self._cache[k])
-        return key
+        return self._incumbent
 
     def fit(self):
         """
@@ -201,9 +170,9 @@ class EA:
         self._pop = self._initialize_population()
 
         while True:
-            print(f"############################################################")
-            print(f"###################### Generation: {self._cur_iter + 1} #######################")
-            print(f"############################################################")
+            print(f"#################################################################")
+            print(f"###################### Generation: {self._cur_iter + 1:6} #######################")
+            print(f"#################################################################")
             print(f"Remaining Walltime: {(self._walltime_limit - (time.time() - self._start_time)):.4f}")
 
             if self._check_walltime_limit():
@@ -211,6 +180,7 @@ class EA:
 
             # Evaluate all genomes in the population
             fitness = self._evaluate()
+            print(f"Fitness: {fitness}")
             if self._check_walltime_limit():
                 return
 

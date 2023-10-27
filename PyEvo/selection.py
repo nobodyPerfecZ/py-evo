@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
 
 class Selection(ABC):
@@ -11,7 +12,7 @@ class Selection(ABC):
     def select(
             self,
             random: np.random.RandomState,
-            cs: HyperparameterConfiguration,
+            cs: HyperparameterConfigurationSpace,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
@@ -71,7 +72,7 @@ class Selection(ABC):
     def _select(
             self,
             random: np.random.RandomState,
-            cs: HyperparameterConfiguration,
+            cs: HyperparameterConfigurationSpace,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
@@ -88,7 +89,7 @@ class ElitistSelection(Selection):
     def _select(
             self,
             random: np.random.RandomState,
-            cs: HyperparameterConfiguration,
+            cs: HyperparameterConfigurationSpace,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
@@ -109,7 +110,7 @@ class TournamentSelection(Selection):
     def _select(
             self,
             random: np.random.RandomState,
-            cs: HyperparameterConfiguration,
+            cs: HyperparameterConfigurationSpace,
             pop: list[HyperparameterConfiguration],
             fitness: list[float],
             optimizer: str,
@@ -125,19 +126,15 @@ class TournamentSelection(Selection):
             tournament_size = random.randint(0, len(pop) - len(new_pop)) + 1
 
             # Select individuals in this tournament (that are not selected before)
-
             indices = random.choice(len(pop) - len(new_pop), size=tournament_size, replace=False)
-            tournament = [pop[idx] for idx in indices]
-            tournament_fitness = [fitness[idx] for idx in indices]
 
             # Select the best individual in that tournament
-            ind = sorted(tournament, key=lambda key: tournament_fitness[tournament.index(key)], reverse=reverse)[0]
-            new_pop += [ind]
+            index = sorted(indices, key=lambda key: fitness[key], reverse=reverse)[0]
+            new_pop += [pop[index]]
 
             # Remove individual from population and fitness
-            index = pop.index(ind)
-            pop.remove(ind)
-            fitness.remove(fitness[index])
+            pop.pop(index)
+            fitness.pop(index)
         return new_pop
 
 # TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)

@@ -125,79 +125,77 @@ class AdaptiveGaussianMutation(GaussianMutation):
     Its self-adaptive method, where the standard deviation (scale) gets changed during the evolutionary algorithm.
     """
 
-    def __init__(self, threshold: float, alpha: float, n_generation: int, initial_loc: float, initial_scale: float,
-                 initial_prob: float):
+    def __init__(
+            self,
+            threshold: float,
+            alpha: float,
+            n_generations: int,
+            initial_loc: float,
+            initial_scale: float,
+            initial_prob: float
+    ):
         super().__init__(initial_loc, initial_scale, initial_prob)
         assert 0.0 < threshold < 1.0, \
             f"Illegal threshold {threshold}. It should be in between of 0.0 < threshold < 1.0!"
         assert 0.0 < alpha < 1.0, \
             f"Illegal alpha {alpha}. It should be in between 0.0 < alpha < 1.0!"
-        assert 1 <= n_generation, \
-            f"Illegal n_generation {n_generation}. It should be 1 <= n_generation!"
+        assert 1 <= n_generations, \
+            f"Illegal n_generation {n_generations}. It should be 1 <= n_generation!"
 
         self._threshold = threshold
         self._alpha = alpha
-        self._n_generation = n_generation
+        self._n_generations = n_generations
 
         # Necessary for the self-adaptation
-        self._fitness = []  # stores the mean fitness over the last n generations
-        self._improvements = 0
-        self._generations = 0
+        self._counter = 0
+        self._last_fitness = None  # stores the fitness of the last generation
+        self._success_rates = []  # stores the success rates over the last n-th generations
 
-    @property
-    def _success_rate(self) -> float:
+    def _sma_success_rate(self) -> float:
         """
         Returns:
             float:
-                The success rate := #improvements over last n-th generation / #generations
+                Simple moving average (SMA) of the success rates over the last n-th generations
         """
-        return self._improvements / self._generations
+        return np.mean(self._success_rates)
 
-    def _update_fitness(self, fitness: list[float]):
+    def _current_success_rate(self, fitness: list[float], optimizer: str) -> float:
         """
-        Updates the (mean) fitness queue of the last n-th generations.
+        Returns:
+            float:
+                The success rate of the current generation. It is calculated by the following formula:
+                    success rate := #successful_mutations / population_size
+        """
+        population_size = len(fitness)
+        successful_mutations = 0
+        for last_f, f in zip(self._last_fitness, fitness):
+            if (optimizer == "min" and f < last_f) or (optimizer == "max" and f > last_f):
+                successful_mutations += 1
+        return successful_mutations / population_size
 
-        If the fitness queue has less than n elements, then it appends the element to the queue.
-        If the fitness queue has more than n elements, then it pops the oldest element from the queue and appends the
-        newest element to the queue.
+    def _update(self, fitness: list[float], optimizer: str) -> bool:
+        """
+        Updates the fitness of the last generation and the success rates over the last n-th generations.
 
         Args:
             fitness (list[float]):
-                The fitness values of the current population
-        """
-        mean_fitness = np.mean(fitness)
-
-        if len(self._fitness) < self._n_generation:
-            # Case: Fill fitness before doing self-adaptation
-            self._fitness.append(mean_fitness)
-        else:
-            # Case: Remove the oldest fitness and fill the newest fitness
-            self._fitness.pop(0)
-            self._fitness.append(mean_fitness)
-
-    def _check_improvement(self, fitness: list[float], optimizer: str) -> bool:
-        """
-        Returns True if the mean fitness of the current population has a better value than the mean fitness over the
-        last n-th generation.
-
-        Args:
-            fitness (list[float]):
-                The fitness values of the current population
+                 The fitness values of the current population
 
             optimizer (str):
                 Type of the optimization problem
                     - optimizer="min": problem should be minimized
                     - optimizer="max": problem should be maximized
-
-        Returns:
-            bool:
-                True, if the current population has an improvement over the last n-th generation
         """
-        mean_fitness = np.mean(fitness)
-        last_fitness = np.mean(self._fitness)
-        if (optimizer == "min" and mean_fitness < last_fitness) or (optimizer == "max" and mean_fitness > last_fitness):
-            return True
-        return False
+        if self._last_fitness is None:
+            self._last_fitness = fitness
+            return False
+        else:
+            if len(self._success_rates) >= self._n_generations:
+                self._success_rates.pop(0)
+            self._success_rates += [self._current_success_rate(fitness, optimizer)]
+            self._last_fitness = fitness
+            self._counter = (self._counter + 1) % self._n_generations
+            return self._counter == 0
 
     def _adaptive_adjustment(self, fitness: list[float], optimizer: str):
         """
@@ -214,27 +212,18 @@ class AdaptiveGaussianMutation(GaussianMutation):
                     - optimizer="min": problem should be minimized
                     - optimizer="max": problem should be maximized
         """
-        if len(self._fitness) < self._n_generation:
-            self._update_fitness(fitness)
-        else:
-            if self._check_improvement(fitness, optimizer):
-                self._improvements += 1
-            self._generations += 1
+        adjustment = self._update(fitness, optimizer)
 
-            # Self-adaptation of standard deviation
-            if self._success_rate > self._threshold:
+        if adjustment:
+            # Do Self-adaptation of standard deviation
+            if self._sma_success_rate() > self._threshold:
                 # Case: Do less exploration, more exploitation
                 self._scale *= self._alpha
-            elif self._success_rate < self._threshold:
+                print(f"Updated std: {self._scale}")
+            elif self._sma_success_rate() < self._threshold:
                 # Case: Do more exploration, less exploitation
                 self._scale /= self._alpha
-
-            self._update_fitness(fitness)
-            print(f"Fitness: {fitness}")
-            print(f"N-th mean fitness: {self._fitness}")
-            print(f"Current mean fitness: {np.mean(fitness)}")
-            print(f"Success Rate={self._success_rate}")
-            print(f"Updated std={self._scale}")
+                print(f"Updated std: {self._scale}")
 
     def _mutate(
             self,
@@ -311,7 +300,7 @@ class AdaptiveUniformMutation(UniformMutation):
             self,
             threshold: float,
             alpha: float,
-            n_generation: int,
+            n_generations: int,
             initial_low: Union[int, float],
             inital_high: Union[int, float],
             initial_prob: float,
@@ -322,76 +311,67 @@ class AdaptiveUniformMutation(UniformMutation):
             f"Illegal threshold {threshold}. It should be in between of 0.0 < threshold < 1.0!"
         assert 0.0 < alpha < 1.0, \
             f"Illegal alpha {alpha}. It should be in between 0.0 < alpha < 1.0!"
-        assert 1 <= n_generation, \
-            f"Illegal n_generation {n_generation}. It should be 1 <= n_generation!"
+        assert 1 <= n_generations, \
+            f"Illegal n_generation {n_generations}. It should be 1 <= n_generation!"
 
         self._threshold = threshold
         self._alpha = alpha
-        self._n_generation = n_generation
+        self._n_generations = n_generations
 
         # Necessary for the self-adaptation
-        self._fitness = []  # stores the mean fitness over the last n generations
-        self._improvements = 0
-        self._generations = 0
+        self._counter = 0
+        self._last_fitness = None  # stores the fitness of the last generation
+        self._success_rates = []  # stores the success rates over the last n-th generations
 
-    @property
-    def _success_rate(self) -> float:
+    def _sma_success_rate(self) -> float:
         """
         Returns:
             float:
-                The success rate := #improvements over last n-th generation / #generations
+                Simple moving average (SMA) of the success rates over the last n-th generations
         """
-        return self._improvements / self._generations
+        return np.mean(self._success_rates)
 
-    def _update_fitness(self, fitness: list[float]):
+    def _current_success_rate(self, fitness: list[float], optimizer: str) -> float:
         """
-        Updates the (mean) fitness queue of the last n-th generations.
+        Returns:
+            float:
+                The success rate of the current generation. It is calculated by the following formula:
+                    success rate := #successful_mutations / population_size
+        """
+        population_size = len(fitness)
+        successful_mutations = 0
+        for last_f, f in zip(self._last_fitness, fitness):
+            if (optimizer == "min" and f < last_f) or (optimizer == "max" and f > last_f):
+                successful_mutations += 1
+        return successful_mutations / population_size
 
-        If the fitness queue has less than n elements, then it appends the element to the queue.
-        If the fitness queue has more than n elements, then it pops the oldest element from the queue and appends the
-        newest element to the queue.
+    def _update(self, fitness: list[float], optimizer: str) -> bool:
+        """
+        Updates the fitness of the last generation and the success rates over the last n-th generations.
 
         Args:
             fitness (list[float]):
-                The fitness values of the current population
-        """
-        mean_fitness = np.mean(fitness)
-
-        if len(self._fitness) < self._n_generation:
-            # Case: Fill fitness before doing self-adaptation
-            self._fitness.append(mean_fitness)
-        else:
-            # Case: Remove the oldest fitness and fill the newest fitness
-            self._fitness.pop(0)
-            self._fitness.append(mean_fitness)
-
-    def _check_improvement(self, fitness: list[float], optimizer: str) -> bool:
-        """
-        Returns True if the mean fitness of the current population has a better value than the mean fitness over the
-        last n-th generation.
-
-        Args:
-            fitness (list[float]):
-                The fitness values of the current population
+                 The fitness values of the current population
 
             optimizer (str):
                 Type of the optimization problem
                     - optimizer="min": problem should be minimized
                     - optimizer="max": problem should be maximized
-
-        Returns:
-            bool:
-                True, if the current population has an improvement over the last n-th generation
         """
-        mean_fitness = np.mean(fitness)
-        last_fitness = np.mean(self._fitness)
-        if (optimizer == "min" and mean_fitness < last_fitness) or (optimizer == "max" and mean_fitness > last_fitness):
-            return True
-        return False
+        if self._last_fitness is None:
+            self._last_fitness = fitness
+            return False
+        else:
+            if len(self._success_rates) >= self._n_generations:
+                self._success_rates.pop(0)
+            self._success_rates += [self._current_success_rate(fitness, optimizer)]
+            self._last_fitness = fitness
+            self._counter = (self._counter + 1) % self._n_generations
+            return self._counter == 0
 
     def _adaptive_adjustment(self, fitness: list[float], optimizer: str):
         """
-        Do an adjustment step of the lower and upper bound after the 1/n-th rule, where we (...)
+        Do an adjustment step of the standard deviation after the 1/n-th rule, where we (...)
             - decrease by a factor alpha if the success rate > threshold
             - increase by a factor alpha if the success rate < threshold
 
@@ -404,30 +384,22 @@ class AdaptiveUniformMutation(UniformMutation):
                     - optimizer="min": problem should be minimized
                     - optimizer="max": problem should be maximized
         """
-        if len(self._fitness) < self._n_generation:
-            self._update_fitness(fitness)
-        else:
-            if self._check_improvement(fitness, optimizer):
-                self._improvements += 1
-            self._generations += 1
+        adjustment = self._update(fitness, optimizer)
 
-            # Self-adaptation of lower and upper bound
-            if self._success_rate > self._threshold:
+        if adjustment:
+            # Do Self-adaptation of standard deviation
+            if self._sma_success_rate() > self._threshold:
                 # Case: Do less exploration, more exploitation
                 self._low *= self._alpha
                 self._high *= self._alpha
-            elif self._success_rate < self._threshold:
+                print(f"Updated lower bound: {self._low}")
+                print(f"Updated upper bound: {self._high}")
+            elif self._sma_success_rate() < self._threshold:
                 # Case: Do more exploration, less exploitation
                 self._low /= self._alpha
                 self._high /= self._alpha
-
-            self._update_fitness(fitness)
-            print(f"Fitness: {fitness}")
-            print(f"N-th mean fitness: {self._fitness}")
-            print(f"Current mean fitness: {np.mean(fitness)}")
-            print(f"Success Rate={self._success_rate}")
-            print(f"Updated lower bound={self._low}")
-            print(f"Updated upper bound={self._high}")
+                print(f"Updated lower bound: {self._low}")
+                print(f"Updated upper bound: {self._high}")
 
     def _mutate(
             self,

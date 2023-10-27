@@ -18,7 +18,8 @@ class TestEA(unittest.TestCase):
 
     def optimization_function(self, cfg: HyperparameterConfiguration) -> float:
         """
-        Example optimization function, where we want to find the minimum value of the Rosenbrock function: https://en.wikipedia.org/wiki/Rosenbrock_function
+        Example optimization function, where we want to find the minimum value of the Rosenbrock function:
+        https://en.wikipedia.org/wiki/Rosenbrock_function
         """
         # Extract the important hps
         a = cfg["a"]
@@ -41,10 +42,10 @@ class TestEA(unittest.TestCase):
         self.EA = EA(
             problem=self.optimization_function,
             cs=self.cs,
-            pop_size=10,
-            selection_factor=3,
+            pop_size=20,
+            selection_factor=2,
             n_iter=None,
-            walltime_limit=100,
+            walltime_limit=10,
             n_cores=1,
             seed=0,
             optimizer="min",
@@ -79,7 +80,7 @@ class TestEA(unittest.TestCase):
         """
         incumbent = self.EA.incumbent
 
-        self.assertIsNone(self.EA.incumbent)
+        self.assertIsNone(incumbent)
 
     def test_fit(self):
         """

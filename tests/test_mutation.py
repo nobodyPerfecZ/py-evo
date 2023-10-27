@@ -7,7 +7,8 @@ from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.hp.categorical import Categorical
 from PyHyperparameterSpace.hp.constant import Constant
 
-from PyEvo.mutation import GaussianMutation, AdaptiveGaussianMutation, UniformMutation, AdaptiveUniformMutation, ChoiceMutation
+from PyEvo.mutation import GaussianMutation, AdaptiveGaussianMutation, UniformMutation, AdaptiveUniformMutation, \
+    ChoiceMutation
 
 
 class TestGaussianMutation(unittest.TestCase):
@@ -52,6 +53,7 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
     """
     Tests the class AdaptiveGaussianMutation.
     """
+
     def setUp(self):
         self.random = np.random.RandomState(0)
         self.cs = HyperparameterConfigurationSpace(
@@ -80,7 +82,7 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
         self.mutator = AdaptiveGaussianMutation(
             threshold=0.2,
             alpha=0.95,
-            n_generation=2,
+            n_generations=2,
             initial_loc=0.0,
             initial_scale=self.initial_scale,
             initial_prob=1.0
@@ -99,9 +101,6 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertEqual(0, self.mutator._improvements)
-        self.assertEqual(2, self.mutator._generations)
-        self.assertEqual(0.0, self.mutator._success_rate)
         self.assertGreater(self.mutator._scale, self.initial_scale)
 
     def test_mutate_maximizer(self):
@@ -117,10 +116,8 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertEqual(2, self.mutator._improvements)
-        self.assertEqual(2, self.mutator._generations)
-        self.assertEqual(1.0, self.mutator._success_rate)
         self.assertLess(self.mutator._scale, self.initial_scale)
+
 
 class TestUniformMutation(unittest.TestCase):
     """
@@ -175,6 +172,7 @@ class TestAdaptiveUniformMutation(unittest.TestCase):
     """
     Tests the class AdaptiveUniformMutation.
     """
+
     def setUp(self):
         self.random = np.random.RandomState(0)
         self.cs = HyperparameterConfigurationSpace(
@@ -204,7 +202,7 @@ class TestAdaptiveUniformMutation(unittest.TestCase):
         self.mutator = AdaptiveUniformMutation(
             threshold=0.2,
             alpha=0.95,
-            n_generation=2,
+            n_generations=2,
             initial_low=self.initial_low,
             inital_high=self.initial_high,
             initial_prob=1.0,
@@ -223,9 +221,6 @@ class TestAdaptiveUniformMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertEqual(0, self.mutator._improvements)
-        self.assertEqual(2, self.mutator._generations)
-        self.assertEqual(0.0, self.mutator._success_rate)
         self.assertLess(self.mutator._low, self.initial_low)
         self.assertGreater(self.mutator._high, self.initial_high)
 
@@ -242,9 +237,6 @@ class TestAdaptiveUniformMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertEqual(2, self.mutator._improvements)
-        self.assertEqual(2, self.mutator._generations)
-        self.assertEqual(1.0, self.mutator._success_rate)
         self.assertGreater(self.mutator._low, self.initial_low)
         self.assertLess(self.mutator._high, self.initial_high)
 
