@@ -54,13 +54,32 @@ class TestEA(unittest.TestCase):
             mutations=UniformMutation(low=-0.5, high=0.5, hp_type="float", prob=1.0),
         )
 
-    def test_initialize_population(self):
+        self.cfg = HyperparameterConfiguration(
+            values={
+                "a": 1,
+                "b": 100,
+                "x": 1.0122048232965808,
+                "y": 1.0238352137771527,
+            }
+        )
+
+    def test_initialize_population_randomly(self):
         """
-        Tests the method initialize_population().
+        Tests the method initialize_population() with no given configuration.
         """
         pop = self.EA._initialize_population()
 
         self.assertEqual(self.EA._pop_size, len(pop))
+
+    def test_initialize_population_local_search(self):
+        """
+        Tests the method initialize_population() with given configuration (local search).
+        """
+        pop = self.EA._initialize_population(self.cfg)
+
+        self.assertEqual(self.EA._pop_size, len(pop))
+        # Check if all individuals in population are equal to the given configuration
+        self.assertTrue(all(ind == self.cfg for ind in pop))
 
     def test_check_n_iter(self):
         """
@@ -82,11 +101,22 @@ class TestEA(unittest.TestCase):
 
         self.assertIsNone(incumbent)
 
-    def test_fit(self):
+    def test_fit_randomly(self):
         """
-        Tests the method fit().
+        Tests the method fit() with no given configuration.
         """
         self.EA.fit()
+        incumbent = self.EA.incumbent
+        value = self.optimization_function(incumbent)
+
+        self.assertIsNotNone(self.EA.incumbent)
+        self.assertLessEqual(value, 0.01)
+
+    def test_fit_local_search(self):
+        """
+        Tests the method fit() with given configuration (local search).
+        """
+        self.EA.fit(self.cfg)
         incumbent = self.EA.incumbent
         value = self.optimization_function(incumbent)
 

@@ -2,6 +2,7 @@ from typing import Callable, Union
 import multiprocessing
 import numpy as np
 import time
+import copy
 
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
@@ -29,7 +30,7 @@ class EA:
             crossovers: Union[Crossover, list[Crossover]],
             mutations: Union[Mutation, list[Mutation]],
     ):
-        assert 1 <= pop_size, f"Illegal pop_size {pop_size}. It should be 1 <= pop_size!"
+        assert 2 <= pop_size, f"Illegal pop_size {pop_size}. It should be 2 <= pop_size!"
         assert 2 <= selection_factor <= pop_size, \
             f"Illegal selection_factor {selection_factor}. It should be 2 <= selection_factor <= pop_size!"
         assert (n_iter is not None and walltime_limit is None) or (n_iter is None and walltime_limit is not None), \
@@ -61,14 +62,27 @@ class EA:
         self._cur_iter = None
         self._incumbent = None
 
-    def _initialize_population(self) -> list[HyperparameterConfiguration]:
+    def _initialize_population(self, cfg: Union[HyperparameterConfiguration, None] = None) \
+            -> list[HyperparameterConfiguration]:
         """
+        Returns the population of the first generation.
+
+        If cfg is given, then the population contains _pop_size of the same individual.
+        It represents the continuation of the local search.
+
+        If cfg is not given, then population contains _pop_size of randomly sampled individual
+        from the configuration space.
+
+        Args:
+            cfg (Union[HyperparameterConfiguration, None]):
+                Individual from where we start the local search
+
         Returns:
             list[HyperparameterConfiguration]:
-                population of the first generation with randomly sampled configurations
+                Population of the first generation
         """
-        if self._pop_size == 1:
-            return [self._cs.sample_configuration(1)]
+        if cfg is not None:
+            return [copy.deepcopy(cfg) for _ in range(self._pop_size)]
         else:
             return self._cs.sample_configuration(self._pop_size)
 
@@ -144,12 +158,16 @@ class EA:
         """
         return self._incumbent
 
-    def fit(self):
+    def fit(self, cfg: Union[HyperparameterConfiguration, None] = None):
         """
         Main loop for the Evolutionary Algorithm (EA), employing the following strategy:
 
         1. Initialization: Generate an initial population of individuals, according to the given hyperparameter
-        configuration space.
+        configuration space or given configuration.
+
+            1. If configuration is given then we continue the local search. The first population contains (_pop_size)
+            of the same configuration.
+            2. If configuration is not given then we sample randomly individuals from the configuration space.
 
         2. Evaluation: Assess the fitness of each individual in the population based on the optimization objective
         (min or max).
@@ -164,10 +182,14 @@ class EA:
             5. Replacement: Form the next generation with the selected parents and childs to create the next population
 
         4. After the .fit() method is called, the best solution can be returned by calling .incumbent
+
+        Args:
+            cfg (Union[HyperparameterConfiguration, None]):
+                Individual from where we start the local search
         """
         self._start_time = time.time()
         self._cur_iter = 0  # current number of generation
-        self._pop = self._initialize_population()
+        self._pop = self._initialize_population(cfg)
 
         while True:
             print(f"#################################################################")

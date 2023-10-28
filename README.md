@@ -2,16 +2,18 @@
 PyEvo is a simple Python Framework for using Evolutionary Algorithm to solve Optimization Problems like 
 Hyperparameter Optimization (HPO) or Neuroevolution Tasks.
 You can find more information about 
-Evolutionary Algorithm [here](https://en.wikipedia.org/wiki/Evolutionary_algorithm) 
-HPO Tasks [here](https://en.wikipedia.org/wiki/Hyperparameter_optimization) or 
-Neuroevolution [here](https://en.wikipedia.org/wiki/Neuroevolution).
+[Evolutionary Algorithm](https://en.wikipedia.org/wiki/Evolutionary_algorithm), 
+[HPO Tasks](https://en.wikipedia.org/wiki/Hyperparameter_optimization) or 
+[Neuroevolution](https://en.wikipedia.org/wiki/Neuroevolution).
 
 ### Solving Optimization problems with PyEvo
 In the following we want to solve a Neuroevolution problem.
 We want to train an agent on the
 [Lunar-Lander-v2 environment](https://gymnasium.farama.org/environments/box2d/lunar_lander/) from Gymnasium.
 
-![Example of an Agent trained via neuroevolution](LunarLanderExample.gif)
+<p align="center">
+  <img width="460" height="300" src="LunarLanderExample.gif">
+</p>
 
 First we have to define our Optimization problem as a function for using it in PyEvo.
 First you have to define your individuals with a `HyperparameterConfigurationSpace`:
@@ -21,25 +23,25 @@ from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.hp.constant import Constant
 
 # Construct a Hyperparameter Configuration Space
-    cs = HyperparameterConfigurationSpace(
-        values={
-            "seed": Constant("seed", default=0),
-            "max_episodes": Constant("max_episodes", default=10),
-            "max_episode_length": Constant("max_episode_length", default=1000),
-            "hidden1_shape": Constant("hidden1_shape", default=64),
-            "hidden2_shape": Constant("hidden2_shape", default=64),
-            "hidden3_shape": Constant("hidden3_shape", default=64),
-            "fc1.weight": Float("fc1.weight", bounds=(-1.0, 1.0), shape=(64, 8)),
-            "fc1.bias": Float("fc1.bias", bounds=(-1.0, 1.0), shape=(64,)),
-            "fc2.weight": Float("fc2.weight", bounds=(-1.0, 1.0), shape=(64, 64)),
-            "fc2.bias": Float("fc2.bias", bounds=(-1.0, 1.0), shape=(64,)),
-            "fc3.weight": Float("fc3.weight", bounds=(-1.0, 1.0), shape=(64, 64)),
-            "fc3.bias": Float("fc3.bias", bounds=(-1.0, 1.0), shape=(64,)),
-            "fc4.weight": Float("fc4.weight", bounds=(-1.0, 1.0), shape=(4, 64)),
-            "fc4.bias": Float("fc4.bias", bounds=(-1.0, 1.0), shape=(4,)),
-        },
-        seed=0,
-    )
+cs = HyperparameterConfigurationSpace(
+    values={
+        "seed": Constant("seed", default=0),
+        "max_episodes": Constant("max_episodes", default=10),
+        "max_episode_length": Constant("max_episode_length", default=1000),
+        "hidden1_shape": Constant("hidden1_shape", default=64),
+        "hidden2_shape": Constant("hidden2_shape", default=64),
+        "hidden3_shape": Constant("hidden3_shape", default=64),
+        "fc1.weight": Float("fc1.weight", bounds=(-1.0, 1.0), shape=(64, 8)),
+        "fc1.bias": Float("fc1.bias", bounds=(-1.0, 1.0), shape=(64,)),
+        "fc2.weight": Float("fc2.weight", bounds=(-1.0, 1.0), shape=(64, 64)),
+        "fc2.bias": Float("fc2.bias", bounds=(-1.0, 1.0), shape=(64,)),
+        "fc3.weight": Float("fc3.weight", bounds=(-1.0, 1.0), shape=(64, 64)),
+        "fc3.bias": Float("fc3.bias", bounds=(-1.0, 1.0), shape=(64,)),
+        "fc4.weight": Float("fc4.weight", bounds=(-1.0, 1.0), shape=(4, 64)),
+        "fc4.bias": Float("fc4.bias", bounds=(-1.0, 1.0), shape=(4,)),
+    },
+    seed=0,
+)
 ```
 
 Each optimization problem is defined as a function, that uses a `HyperparameterConfiguration` and returns a `float` 
@@ -96,8 +98,9 @@ class ExampleNet(nn.Module):
 
 def optimization_problem(cfg: HyperparameterConfiguration, render: bool = False) -> float:
     """
-    Our optimization problem, where we want to find a good weight configuration to solve the LunarLander-v2 environment
-    from Gymnasium.
+    Our optimization problem, where we want to find a good weight configuration
+    to solve the LunarLander-v2 environment from Gymnasium.
+    
     Args:
         cfg (HyperparameterConfiguration):
             Individual we want to evaluate
@@ -200,8 +203,9 @@ print(f"Reward: {reward}")
 The following list defines features, that are currently on work:
 
 * [ ] Adjust EA class for multi-objective optimization
+* [x] Make it possible to do another .fit() after trained before (local search)
 * [x] Self adaptive mutation/selection/crossover (added self-adaptation for gaussian/uniform mutation)
-* [ ] Add more selection types
+* [ ] Add more selection types (e. g.: Fitness proportional selection)
 * [ ] Add more mutation types
 * [ ] Add more crossover types
   
