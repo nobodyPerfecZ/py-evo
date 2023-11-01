@@ -6,17 +6,16 @@ You can find more information about
 [HPO Tasks](https://en.wikipedia.org/wiki/Hyperparameter_optimization) or 
 [Neuroevolution](https://en.wikipedia.org/wiki/Neuroevolution).
 
+<p align="center">
+    <img width="300" height="200" src="CartPoleExample.gif">
+    <img width="300" height="200" src="MountainCarExample.gif">
+    <img width="300" height="200" src="LunarLanderExample.gif">
+</p>
+
 ### Solving Optimization problems with PyEvo
 In the following we want to solve a Neuroevolution problem.
 We want to train an agent on the
 [Lunar-Lander-v2 environment](https://gymnasium.farama.org/environments/box2d/lunar_lander/) from Gymnasium.
-
-<p align="center">
-    <img width="300" height="200" src="CartPoleExample.gif">
-    <img width="300" height="200" src="LunarLanderExample.gif">
-    <img width="300" height="200" src="MountainCarExample.gif">
-</p>
-
 
 First we have to define our Optimization problem as a function for using it in PyEvo.
 First you have to define your individuals with a `HyperparameterConfigurationSpace`:
