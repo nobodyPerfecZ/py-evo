@@ -12,8 +12,11 @@ We want to train an agent on the
 [Lunar-Lander-v2 environment](https://gymnasium.farama.org/environments/box2d/lunar_lander/) from Gymnasium.
 
 <p align="center">
-  <img width="460" height="300" src="LunarLanderExample.gif">
+    <img width="300" height="200" src="CartPoleExample.gif">
+    <img width="300" height="200" src="LunarLanderExample.gif">
+    <img width="300" height="200" src="MountainCarExample.gif">
 </p>
+
 
 First we have to define our Optimization problem as a function for using it in PyEvo.
 First you have to define your individuals with a `HyperparameterConfigurationSpace`:
@@ -204,6 +207,8 @@ The following list defines features, that are currently on work:
 
 * [ ] Adjust EA class for multi-objective optimization
 * [x] Make it possible to do another .fit() after trained before (local search)
+* [ ] Maybe: Implement own fitness class, where we define the functions for computing statistics ?
+* [ ] Self adaptive mutation based on CMA-ES
 * [x] Self adaptive mutation/selection/crossover (added self-adaptation for gaussian/uniform mutation)
 * [ ] Add more selection types (e. g.: Fitness proportional selection)
 * [ ] Add more mutation types
