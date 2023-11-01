@@ -1,7 +1,7 @@
 # PyEvo
 PyEvo is a simple Python Framework for using Evolutionary Algorithm to solve Optimization Problems like 
 Hyperparameter Optimization (HPO) or Neuroevolution Tasks.
-You can find more information about 
+Here you can find more information about
 [Evolutionary Algorithm](https://en.wikipedia.org/wiki/Evolutionary_algorithm), 
 [HPO Tasks](https://en.wikipedia.org/wiki/Hyperparameter_optimization) or 
 [Neuroevolution](https://en.wikipedia.org/wiki/Neuroevolution).
