@@ -208,11 +208,10 @@ class EA:
 
             if not self._check_n_iter():
                 # Perform selection
-                # TODO: Return non-selected individuals from the population
-                # TODO: Return fitness values of non-selected individuals
-                # TODO: Return also the corresponding fitness values of the selected population
-                pop, fitness, _, _ = self._selections.select(self._random, self._cs, self._pop, fitness,
-                                                             self._optimizer, self._pop_size // self._selection_factor)
+                pop, fitness, non_selected, fitness_non_selected = self._selections.select(self._random, self._cs,
+                                                                                           self._pop, fitness,
+                                                                                           self._optimizer,
+                                                                                           self._pop_size // self._selection_factor)
 
                 if self._check_walltime_limit():
                     return
