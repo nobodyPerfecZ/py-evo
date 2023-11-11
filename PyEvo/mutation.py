@@ -10,7 +10,13 @@ from PyHyperparameterSpace.configuration import HyperparameterConfiguration
 
 
 class Mutation(ABC):
-    """ Abstract class to model the mutation phase of an evolutionary algorithm. """
+    """
+    Abstract class to model the mutation phase of an evolutionary algorithm.
+
+        Args:
+            prob (float):
+                Probability that the mutation occurs
+    """
 
     def __init__(self, prob: float):
         assert 0.0 <= prob <= 1.0, f"Invalid prob {prob}. It should be in between 0 <= prob <= 1!"
@@ -82,12 +88,22 @@ class GaussianMutation(Mutation):
     """
     Class representing a mutation operation that introduces noise to float hyperparameters.
     The mutation perturbs hyperparameters using random values drawn from a normal distribution.
+
+        Args:
+            mean (float):
+                Mu of the normal distribution N(mu, sigma)
+
+            std (float):
+                Sigma of the normal distribution N(mu, sigma)
+
+            prob (float):
+                Probability that the mutation occurs
     """
 
-    def __init__(self, loc: float, scale: float, prob: float):
+    def __init__(self, mean: float, std: float, prob: float):
         super().__init__(prob)
-        self._loc = loc
-        self._scale = scale
+        self._mean = mean
+        self._std = std
 
     def _mutate(
             self,
@@ -102,17 +118,13 @@ class GaussianMutation(Mutation):
             for key, hp in ind.items():
                 if isinstance(cs[key], Float) and random.random() <= self._prob:
                     if isinstance(cs, float):
-                        ind[key] += random.normal(loc=self._loc, scale=self._scale)
-
-                        # Check for bounds
+                        ind[key] = ind[key] + self._mean + self._std * random.normal(loc=0, scale=1)
                         if ind[key] < cs[key].lb:
                             ind[key] = cs[key].lb
                         elif ind[key] >= cs[key].ub:
                             ind[key] = cs[key].ub - 1e-10
                     elif isinstance(hp, np.ndarray):
-                        ind[key] += random.normal(loc=self._loc, scale=self._scale, size=hp.shape)
-
-                        # Check for bounds
+                        ind[key] = ind[key] + self._mean + self._std * random.normal(loc=0, scale=1, size=hp.shape)
                         ind[key][ind[key] < cs[key].lb] = cs[key].lb
                         ind[key][ind[key] >= cs[key].ub] = cs[key].ub - 1e-10
         return pop
@@ -218,12 +230,12 @@ class AdaptiveGaussianMutation(GaussianMutation):
             # Do Self-adaptation of standard deviation
             if self._sma_success_rate() > self._threshold:
                 # Case: Do less exploration, more exploitation
-                self._scale *= self._alpha
-                print(f"Updated std: {self._scale}")
+                self._std *= self._alpha
+                print(f"Updated std: {self._std}")
             elif self._sma_success_rate() < self._threshold:
                 # Case: Do more exploration, less exploitation
-                self._scale /= self._alpha
-                print(f"Updated std: {self._scale}")
+                self._std /= self._alpha
+                print(f"Updated std: {self._std}")
 
     def _mutate(
             self,

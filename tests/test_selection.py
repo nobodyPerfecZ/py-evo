@@ -45,27 +45,75 @@ class TestElitistSelection(unittest.TestCase):
         """
         Tests the method select() with minimizer.
         """
-        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_select)
+        selected, fitness_selected, non_selected, fitness_non_selected = self.selector.select(self.random, self.cs,
+                                                                                              self.pop, self.fitness,
+                                                                                              self.optimizer_min,
+                                                                                              self.n_select)
 
-        self.assertEqual(self.n_select, len(new_pop))
-        self.assertEqual(new_pop[0], self.pop[4])
-        self.assertEqual(new_pop[1], self.pop[0])
-        self.assertEqual(new_pop[2], self.pop[9])
-        self.assertEqual(new_pop[3], self.pop[8])
-        self.assertEqual(new_pop[4], self.pop[5])
+        self.assertEqual(self.n_select, len(selected))
+        self.assertEqual(selected[0], self.pop[4])
+        self.assertEqual(selected[1], self.pop[0])
+        self.assertEqual(selected[2], self.pop[9])
+        self.assertEqual(selected[3], self.pop[8])
+        self.assertEqual(selected[4], self.pop[5])
+
+        self.assertEqual(self.n_select, len(fitness_selected))
+        self.assertEqual(fitness_selected[0], self.fitness[4])
+        self.assertEqual(fitness_selected[1], self.fitness[0])
+        self.assertEqual(fitness_selected[2], self.fitness[9])
+        self.assertEqual(fitness_selected[3], self.fitness[8])
+        self.assertEqual(fitness_selected[4], self.fitness[5])
+
+        self.assertEqual(len(self.pop) - self.n_select, len(non_selected))
+        self.assertEqual(non_selected[0], self.pop[1])
+        self.assertEqual(non_selected[1], self.pop[2])
+        self.assertEqual(non_selected[2], self.pop[7])
+        self.assertEqual(non_selected[3], self.pop[3])
+        self.assertEqual(non_selected[4], self.pop[6])
+
+        self.assertEqual(len(self.fitness) - self.n_select, len(fitness_non_selected))
+        self.assertEqual(fitness_non_selected[0], self.fitness[1])
+        self.assertEqual(fitness_non_selected[1], self.fitness[2])
+        self.assertEqual(fitness_non_selected[2], self.fitness[7])
+        self.assertEqual(fitness_non_selected[3], self.fitness[3])
+        self.assertEqual(fitness_non_selected[4], self.fitness[6])
 
     def test_select_maximize(self):
         """
         Tests the method select() with maximizer.
         """
-        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_max, self.n_select)
+        selected, fitness_selected, non_selected, fitness_non_selected = self.selector.select(self.random, self.cs,
+                                                                                              self.pop, self.fitness,
+                                                                                              self.optimizer_max,
+                                                                                              self.n_select)
 
-        self.assertEqual(self.n_select, len(new_pop))
-        self.assertEqual(new_pop[0], self.pop[6])
-        self.assertEqual(new_pop[1], self.pop[3])
-        self.assertEqual(new_pop[2], self.pop[7])
-        self.assertEqual(new_pop[3], self.pop[2])
-        self.assertEqual(new_pop[4], self.pop[1])
+        self.assertEqual(self.n_select, len(selected))
+        self.assertEqual(selected[0], self.pop[6])
+        self.assertEqual(selected[1], self.pop[3])
+        self.assertEqual(selected[2], self.pop[7])
+        self.assertEqual(selected[3], self.pop[2])
+        self.assertEqual(selected[4], self.pop[1])
+
+        self.assertEqual(self.n_select, len(fitness_selected))
+        self.assertEqual(fitness_selected[0], self.fitness[6])
+        self.assertEqual(fitness_selected[1], self.fitness[3])
+        self.assertEqual(fitness_selected[2], self.fitness[7])
+        self.assertEqual(fitness_selected[3], self.fitness[2])
+        self.assertEqual(fitness_selected[4], self.fitness[1])
+
+        self.assertEqual(len(self.pop) - self.n_select, len(non_selected))
+        self.assertEqual(non_selected[0], self.pop[5])
+        self.assertEqual(non_selected[1], self.pop[8])
+        self.assertEqual(non_selected[2], self.pop[9])
+        self.assertEqual(non_selected[3], self.pop[0])
+        self.assertEqual(non_selected[4], self.pop[4])
+
+        self.assertEqual(len(self.fitness) - self.n_select, len(fitness_non_selected))
+        self.assertEqual(fitness_non_selected[0], self.fitness[5])
+        self.assertEqual(fitness_non_selected[1], self.fitness[8])
+        self.assertEqual(fitness_non_selected[2], self.fitness[9])
+        self.assertEqual(fitness_non_selected[3], self.fitness[0])
+        self.assertEqual(fitness_non_selected[4], self.fitness[4])
 
 
 class TestTournamentSelection(unittest.TestCase):
@@ -103,27 +151,74 @@ class TestTournamentSelection(unittest.TestCase):
         Tests the method select() with minimizer.
         """
 
-        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_select)
+        selected, fitness_selected, non_selected, fitness_non_selected = self.selector.select(self.random, self.cs,
+                                                                                              self.pop, self.fitness,
+                                                                                              self.optimizer_min,
+                                                                                              self.n_select)
+        self.assertEqual(self.n_select, len(selected))
+        self.assertEqual(selected[0], self.pop[4])
+        self.assertEqual(selected[1], self.pop[0])
+        self.assertEqual(selected[2], self.pop[3])
+        self.assertEqual(selected[3], self.pop[5])
+        self.assertEqual(selected[4], self.pop[1])
 
-        self.assertEqual(self.n_select, len(new_pop))
-        self.assertIn(new_pop[0], self.pop)
-        self.assertIn(new_pop[1], self.pop)
-        self.assertIn(new_pop[2], self.pop)
-        self.assertIn(new_pop[3], self.pop)
-        self.assertIn(new_pop[4], self.pop)
+        self.assertEqual(self.n_select, len(fitness_selected))
+        self.assertEqual(fitness_selected[0], self.fitness[4])
+        self.assertEqual(fitness_selected[1], self.fitness[0])
+        self.assertEqual(fitness_selected[2], self.fitness[3])
+        self.assertEqual(fitness_selected[3], self.fitness[5])
+        self.assertEqual(fitness_selected[4], self.fitness[1])
+
+        self.assertEqual(len(self.pop) - self.n_select, len(non_selected))
+        self.assertEqual(non_selected[0], self.pop[2])
+        self.assertEqual(non_selected[1], self.pop[6])
+        self.assertEqual(non_selected[2], self.pop[7])
+        self.assertEqual(non_selected[3], self.pop[8])
+        self.assertEqual(non_selected[4], self.pop[9])
+
+        self.assertEqual(len(self.fitness) - self.n_select, len(fitness_non_selected))
+        self.assertEqual(fitness_non_selected[0], self.fitness[2])
+        self.assertEqual(fitness_non_selected[1], self.fitness[6])
+        self.assertEqual(fitness_non_selected[2], self.fitness[7])
+        self.assertEqual(fitness_non_selected[3], self.fitness[8])
+        self.assertEqual(fitness_non_selected[4], self.fitness[9])
 
     def test_select_maximizer(self):
         """
         Tests the method select() with maximizer.
         """
-        new_pop = self.selector.select(self.random, self.cs, self.pop, self.fitness, self.optimizer_max, self.n_select)
+        selected, fitness_selected, non_selected, fitness_non_selected = self.selector.select(self.random, self.cs,
+                                                                                              self.pop, self.fitness,
+                                                                                              self.optimizer_max,
+                                                                                              self.n_select)
 
-        self.assertEqual(self.n_select, len(new_pop))
-        self.assertIn(new_pop[0], self.pop)
-        self.assertIn(new_pop[1], self.pop)
-        self.assertIn(new_pop[2], self.pop)
-        self.assertIn(new_pop[3], self.pop)
-        self.assertIn(new_pop[4], self.pop)
+        self.assertEqual(self.n_select, len(selected))
+        self.assertEqual(selected[0], self.pop[6])
+        self.assertEqual(selected[1], self.pop[3])
+        self.assertEqual(selected[2], self.pop[2])
+        self.assertEqual(selected[3], self.pop[4])
+        self.assertEqual(selected[4], self.pop[1])
+
+        self.assertEqual(self.n_select, len(fitness_selected))
+        self.assertEqual(fitness_selected[0], self.fitness[6])
+        self.assertEqual(fitness_selected[1], self.fitness[3])
+        self.assertEqual(fitness_selected[2], self.fitness[2])
+        self.assertEqual(fitness_selected[3], self.fitness[4])
+        self.assertEqual(fitness_selected[4], self.fitness[1])
+
+        self.assertEqual(len(self.pop) - self.n_select, len(non_selected))
+        self.assertEqual(non_selected[0], self.pop[0])
+        self.assertEqual(non_selected[1], self.pop[5])
+        self.assertEqual(non_selected[2], self.pop[7])
+        self.assertEqual(non_selected[3], self.pop[8])
+        self.assertEqual(non_selected[4], self.pop[9])
+
+        self.assertEqual(len(self.fitness) - self.n_select, len(fitness_non_selected))
+        self.assertEqual(fitness_non_selected[0], self.fitness[0])
+        self.assertEqual(fitness_non_selected[1], self.fitness[5])
+        self.assertEqual(fitness_non_selected[2], self.fitness[7])
+        self.assertEqual(fitness_non_selected[3], self.fitness[8])
+        self.assertEqual(fitness_non_selected[4], self.fitness[9])
 
 
 if __name__ == '__main__':

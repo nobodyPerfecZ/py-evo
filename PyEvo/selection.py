@@ -18,7 +18,7 @@ class Selection(ABC):
             optimizer: str,
             n_select: int,
             **kwargs,
-    ) -> list[HyperparameterConfiguration]:
+    ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
         """
         Choose from the population new individuals to be selected for the next generation.
 
@@ -47,8 +47,19 @@ class Selection(ABC):
                 additional parameters for the function
 
         Returns:
-            list[HyperparameterConfiguration]:
-                The individuals that are selected for the next generation
+            tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
+                The following information's are returned:
+                [0] (list[HyperparameterConfiguration]):
+                    The individuals that are selected for the next generation
+
+                [1] (list[float]):
+                    The fitness values of the individuals that are selected for the next generation
+
+                [2] (list[HyperparameterConfiguration]):
+                    The individuals that are not-selected for the next generation
+
+                [3] (list[float]):
+                    The fitness values of the individuals that are not-selected for the next generation
         """
         # Check if each individual in population has all hyperparameters from the configuration space
         assert all(key in p for p in pop for key in cs), \
@@ -78,7 +89,7 @@ class Selection(ABC):
             optimizer: str,
             n_select: int,
             **kwargs,
-    ):
+    ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
         pass
 
 
@@ -86,6 +97,7 @@ class ElitistSelection(Selection):
     """
     Class that represents an elitist selection, where only the best len(pop)/N individuals survives the next generation.
     """
+
     def _select(
             self,
             random: np.random.RandomState,
@@ -95,10 +107,21 @@ class ElitistSelection(Selection):
             optimizer: str,
             n_select: int,
             **kwargs,
-    ) -> list[HyperparameterConfiguration]:
+    ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
         reverse = False if optimizer == "min" else True
-        new_pop = sorted(pop, key=lambda key: fitness[pop.index(key)], reverse=reverse)[:n_select]
-        return new_pop
+
+        # Return the indices of the sorted lists
+        indices = sorted(range(len(fitness)), key=lambda idx: fitness[idx], reverse=reverse)
+        fitness_sorted = [fitness[idx] for idx in indices]
+        pop_sorted = [pop[idx] for idx in indices]
+
+        # Divide to selected and non-selected
+        selected = pop_sorted[:n_select]
+        fitness_selected = fitness_sorted[:n_select]
+        non_selected = pop_sorted[n_select:]
+        fitness_non_selected = fitness_sorted[n_select:]
+
+        return selected, fitness_selected, non_selected, fitness_non_selected
 
 
 class TournamentSelection(Selection):
@@ -116,25 +139,31 @@ class TournamentSelection(Selection):
             optimizer: str,
             n_select: int,
             **kwargs
-    ) -> list[HyperparameterConfiguration]:
+    ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
         reverse = False if optimizer == "min" else True
-        new_pop = []
+        selected = []
+        fitness_selected = []
 
         # Choose the individuals per tournament selection
         for _ in range(n_select):
             # Select the tournament size
-            tournament_size = random.randint(0, len(pop) - len(new_pop)) + 1
+            tournament_size = random.randint(0, len(pop) - len(selected)) + 1
 
             # Select individuals in this tournament (that are not selected before)
-            indices = random.choice(len(pop) - len(new_pop), size=tournament_size, replace=False)
+            indices = random.choice(len(pop) - len(selected), size=tournament_size, replace=False)
 
             # Select the best individual in that tournament
             index = sorted(indices, key=lambda key: fitness[key], reverse=reverse)[0]
-            new_pop += [pop[index]]
+            selected += [pop[index]]
+            fitness_selected += [fitness[index]]
 
             # Remove individual from population and fitness
             pop.pop(index)
             fitness.pop(index)
-        return new_pop
+
+        # Safe the non-selected individuals with their fitness
+        non_selected = pop
+        fitness_non_selected = fitness
+        return selected, fitness_selected, non_selected, fitness_non_selected
 
 # TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)

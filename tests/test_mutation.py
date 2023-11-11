@@ -37,7 +37,7 @@ class TestGaussianMutation(unittest.TestCase):
         self.fitness = [-92, -17, 22, 56, -96, -20, 76, 29, -48, -56]
         self.optimizer_min = "min"
         self.optimizer_max = "max"
-        self.mutator = GaussianMutation(loc=0.0, scale=1.0, prob=1.0)
+        self.mutator = GaussianMutation(mean=0.0, std=1.0, prob=1.0)
 
     def test_mutate(self):
         """
@@ -101,7 +101,7 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertGreater(self.mutator._scale, self.initial_scale)
+        self.assertGreater(self.mutator._std, self.initial_scale)
 
     def test_mutate_maximizer(self):
         """
@@ -116,7 +116,7 @@ class TestAdaptiveGaussianMutation(unittest.TestCase):
         self.assertNotEqual(self.pop, new_pop)
 
         # Check if the updates are done right
-        self.assertLess(self.mutator._scale, self.initial_scale)
+        self.assertLess(self.mutator._std, self.initial_scale)
 
 
 class TestUniformMutation(unittest.TestCase):
