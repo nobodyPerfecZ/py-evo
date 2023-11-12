@@ -7,12 +7,12 @@ from PyHyperparameterSpace.hp.continuous import Float, Integer
 from PyHyperparameterSpace.hp.categorical import Categorical
 from PyHyperparameterSpace.hp.constant import Constant
 
-from PyEvo.crossover import CopyCrossover, UniformCrossover, IntermediateCrossover
+from PyEvo.crossover import NoCrossover, UniformCrossover, IntermediateCrossover
 
 
-class TestCopyCrossover(unittest.TestCase):
+class TestNoCrossover(unittest.TestCase):
     """
-    Tests the class CopyCrossover.
+    Tests the class NoCrossover.
     """
 
     def setUp(self):
@@ -37,7 +37,7 @@ class TestCopyCrossover(unittest.TestCase):
         self.optimizer_min = "min"
         self.optimizer_max = "max"
         self.n_childs = 10
-        self.crossover = CopyCrossover()
+        self.crossover = NoCrossover()
 
     def test_crossover(self):
         """

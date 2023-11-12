@@ -161,6 +161,10 @@ class FitnessSoftmaxNormalizer(FitnessPreprocessor):
     Each fitness value gets normalized by dividing the individual softmax fitness value from the sum of all softmax
     fitness values:
         - fitness_normalized := softmax(fitness / temperature) / sum(softmax(fitness / temperature)
+
+        Args:
+            temperature (float):
+                The temperature parameter controlling the sensitivity to fitness differences
     """
 
     def __init__(self, temperature: float = 1.0):

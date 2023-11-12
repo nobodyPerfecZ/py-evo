@@ -168,7 +168,21 @@ class TournamentSelection(Selection):
 
 
 class FitnessProportionalSelection(Selection):
-    # TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
+    """
+    Class that represents a fitness proportional selection, also known as roulette wheel selection, where each
+    individual are sampled based on the probabilities that are proportional to their fitness and the optimizer.
+    If the given optimizer minimize the problem, then lower fitness values gets a higher probability to be sampled.
+    For maximization higher fitness values gets a higher probability.
+
+    More information to fitness proportional selection can be found here: https://en.wikipedia.org/wiki/Fitness_proportionate_selection
+
+        Args:
+            temperature (float):
+                The temperature parameter controlling the sensitivity to fitness differences
+
+            replace (bool):
+                Argument to control if individuals can be sampled more than one time
+    """
     def __init__(self, temperature: float = 1.0, replace: bool = False):
         assert temperature > 0.0, f"Illegal temperature {temperature}. This argument should be higher than 0.0!"
         self._temperature = temperature

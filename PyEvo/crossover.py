@@ -80,7 +80,7 @@ class Crossover(ABC):
         pass
 
 
-class CopyCrossover(Crossover):
+class NoCrossover(Crossover):
     """
     Class representing a crossover operation, that creates the childs by simply copying the parents (no real crossover).
     """
