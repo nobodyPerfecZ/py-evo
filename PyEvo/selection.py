@@ -166,4 +166,30 @@ class TournamentSelection(Selection):
         fitness_non_selected = fitness
         return selected, fitness_selected, non_selected, fitness_non_selected
 
-# TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
+
+class FitnessProportionalSelection(Selection):
+    # TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
+    def __init__(self, replace: bool = False):
+        self._replace = replace
+    def _select(
+            self,
+            random: np.random.RandomState,
+            cs: HyperparameterConfigurationSpace,
+            pop: list[HyperparameterConfiguration],
+            fitness: list[float],
+            optimizer: str,
+            n_select: int,
+            **kwargs,
+    ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
+        assert sum(fitness) == 1, \
+            "Illegal fitness. The sum of the fitness values should be equal to 1 (as in a probability distribution)!"
+
+        indices = random.choice(range(len(pop)), size=n_select, replace=self._replace, p=fitness)
+
+        # Extract the selected, non-selected individuals and fitness values
+        selected = [pop[idx] for idx in indices]
+        fitness_selected = [fitness[idx] for idx in indices]
+        non_selected = [pop[idx] for idx in range(len(pop)) if idx not in indices]
+        fitness_non_selected = [fitness[idx] for idx in range(len(pop)) if idx not in indices]
+
+        return selected, fitness_selected, non_selected, fitness_non_selected
