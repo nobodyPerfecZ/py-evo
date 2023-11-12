@@ -96,7 +96,6 @@ class TestFitnessNormalizer(unittest.TestCase):
         preprocessed_fitness = self.fitness_preprocessor.preprocess_fitness(self.random, self.cs, self.pop,
                                                                             self.fitness, self.optimizer_min)
         normalized = [(f - min(self.fitness)) / (max(self.fitness) - min(self.fitness)) for f in self.fitness]
-        normalized = [f / sum(normalized) for f in normalized]
         self.assertEqual(len(self.fitness), len(preprocessed_fitness))
         self.assertEqual(normalized, preprocessed_fitness)
 
@@ -107,7 +106,6 @@ class TestFitnessNormalizer(unittest.TestCase):
         preprocessed_fitness = self.fitness_preprocessor.preprocess_fitness(self.random, self.cs, self.pop,
                                                                             self.fitness, self.optimizer_max)
         normalized = [(f - min(self.fitness)) / (max(self.fitness) - min(self.fitness)) for f in self.fitness]
-        normalized = [f / sum(normalized) for f in normalized]
         self.assertEqual(len(self.fitness), len(preprocessed_fitness))
         self.assertEqual(normalized, preprocessed_fitness)
 
@@ -148,6 +146,7 @@ class TestFitnessZScoreNormalizer(unittest.TestCase):
         preprocessed_fitness = self.fitness_preprocessor.preprocess_fitness(self.random, self.cs, self.pop,
                                                                             self.fitness, self.optimizer_min)
         normalized = [(f - np.mean(self.fitness)) / np.std(self.fitness) for f in self.fitness]
+
         self.assertEqual(len(self.fitness), len(preprocessed_fitness))
         self.assertEqual(normalized, preprocessed_fitness)
 
@@ -158,6 +157,7 @@ class TestFitnessZScoreNormalizer(unittest.TestCase):
         preprocessed_fitness = self.fitness_preprocessor.preprocess_fitness(self.random, self.cs, self.pop,
                                                                             self.fitness, self.optimizer_max)
         normalized = [(f - np.mean(self.fitness)) / np.std(self.fitness) for f in self.fitness]
+
         self.assertEqual(len(self.fitness), len(preprocessed_fitness))
         self.assertEqual(normalized, preprocessed_fitness)
 
@@ -259,7 +259,7 @@ class TestFitnessRanker(unittest.TestCase):
         preprocessed_fitness = self.fitness_preprocessor.preprocess_fitness(self.random, self.cs, self.pop,
                                                                             self.fitness, self.optimizer_max)
         self.assertEqual(len(self.fitness), len(preprocessed_fitness))
-        self.assertEqual([9, 5, 4, 2, 10, 6, 1, 3, 7, 8], preprocessed_fitness)
+        self.assertEqual([2, 6, 7, 9, 1, 5, 10, 8, 4, 3], preprocessed_fitness)
 
 
 if __name__ == '__main__':

@@ -28,9 +28,9 @@ jobs:
         uses: py-actions/py-dependency-install@v4
         with:
           path: "requirements.txt"
-      - name: Build Python Package
-        run: |
-          pip install .
+      #- name: Build Python Package
+      #  run: |
+      #    pip install .
       - name: Run Unittests
         run: |
           python -m unittest discover -s tests/ -p "test_*.py"

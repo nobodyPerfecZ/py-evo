@@ -98,14 +98,7 @@ class NoFitnessPreprocessing(FitnessPreprocessor):
 class FitnessNormalizer(FitnessPreprocessor):
     """
     Class responsible for normalizing fitness values of a population from [-min_value, +max_value] to [0, 1].
-
-        Args:
-            normalize (bool):
-                The normalized fitness values gets transformed to a probability distribution, where sum(fitness) = 1.
     """
-
-    def __init__(self, normalize: bool = True):
-        self._normalize = normalize
 
     def _preprocess_fitness(
             self,
@@ -127,15 +120,6 @@ class FitnessNormalizer(FitnessPreprocessor):
         # Return normalized fitness values (from [-min_value, +max_value] -> [0, 1])
         normalized_values = [(f - min_fitness) / (max_fitness - min_fitness) for f in fitness]
 
-        if self._normalize:
-            # Case: Normalize to a probability distribution
-            sum_values = sum(normalized_values)
-
-            if sum_values == 0:
-                # Case: Prevent dividing with 0
-                sum_values = 1e-10
-
-            normalized_values = [f / sum_values for f in normalized_values]
         return normalized_values
 
 
@@ -205,7 +189,11 @@ class FitnessRanker(FitnessPreprocessor):
     """
     Class responsible for rank-based fitness assignment.
 
-    Each transformed fitness value responds to a rank r_i based on the performance (fitness) f_i of the individual.
+    Each transformed fitness value responds to a rank r_i based on the performance (fitness) f_i of the individual in
+    asc order.
+
+    The lowest fitness value f_i gets the lowest rank value r_i := start, where the highest fitness value f_i gets the
+    highest rank value r_j := start + j
 
         Args:
             start (int):
@@ -225,10 +213,8 @@ class FitnessRanker(FitnessPreprocessor):
             optimizer: str,
             **kwargs,
     ) -> list[float]:
-        reverse = False if optimizer == "min" else True
-
         # Return indices of the sorted list
-        indices = sorted(range(len(fitness)), key=lambda idx: fitness[idx], reverse=reverse)
+        indices = sorted(range(len(fitness)), key=lambda idx: fitness[idx], reverse=False)
 
         # Assign each fitness value the ranks
         ranks = [0 for _ in range(len(fitness))]

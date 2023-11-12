@@ -169,8 +169,11 @@ class TournamentSelection(Selection):
 
 class FitnessProportionalSelection(Selection):
     # TODO: Implement fitness proportionate selection (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
-    def __init__(self, replace: bool = False):
+    def __init__(self, temperature: float = 1.0, replace: bool = False):
+        assert temperature > 0.0, f"Illegal temperature {temperature}. This argument should be higher than 0.0!"
+        self._temperature = temperature
         self._replace = replace
+
     def _select(
             self,
             random: np.random.RandomState,
@@ -181,10 +184,25 @@ class FitnessProportionalSelection(Selection):
             n_select: int,
             **kwargs,
     ) -> tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:
-        assert sum(fitness) == 1, \
-            "Illegal fitness. The sum of the fitness values should be equal to 1 (as in a probability distribution)!"
 
-        indices = random.choice(range(len(pop)), size=n_select, replace=self._replace, p=fitness)
+        if optimizer == "min":
+            # Case: Minimization problem, so lower values should get higher probabilities
+            # Negative all fitness values
+            corrected_fitness = [-f for f in fitness]
+        else:
+            # Case: Maximization problem
+            # No need to change the fitness values
+            corrected_fitness = [f for f in fitness]
+
+        # Normalize the fitness values to a probability distribution via softmax
+        exp_values = [np.exp(f / self._temperature) for f in corrected_fitness]
+        sum_exp_values = sum(exp_values)
+        if sum_exp_values == 0:
+            # Case: Prevent from dividing with zero
+            sum_exp_values = 1e-10
+        prob = [f / sum_exp_values for f in exp_values]
+
+        indices = random.choice(range(len(pop)), size=n_select, replace=self._replace, p=prob)
 
         # Extract the selected, non-selected individuals and fitness values
         selected = [pop[idx] for idx in indices]
