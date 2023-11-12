@@ -6,6 +6,7 @@ from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.hp.constant import Constant
 
 from PyEvo.ea import EA
+from PyEvo.fitness import NoFitnessPreprocessing
 from PyEvo.selection import TournamentSelection
 from PyEvo.crossover import UniformCrossover
 from PyEvo.mutation import UniformMutation
@@ -49,6 +50,7 @@ class TestEA(unittest.TestCase):
             n_cores=1,
             seed=0,
             optimizer="min",
+            fitness_preprocessors=NoFitnessPreprocessing(),
             selections=TournamentSelection(),
             crossovers=UniformCrossover(),
             mutations=UniformMutation(low=-0.5, high=0.5, hp_type="float", prob=1.0),

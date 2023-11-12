@@ -69,6 +69,9 @@ class Mutation(ABC):
         assert optimizer == "min" or optimizer == "max", \
             f"Illegal optimizer {optimizer}. It should be 'min' or 'max'!"
 
+        assert len(pop) == len(fitness), \
+            "Illegal population and fitness. Each individual should be assigned to a fitness value!"
+
         return self._mutate(random, cs, copy.deepcopy(pop), copy.deepcopy(fitness), optimizer, **kwargs)
 
     @abstractmethod

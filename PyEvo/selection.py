@@ -27,7 +27,7 @@ class Selection(ABC):
                 The random generator for the sampling procedure
 
             cs (HyperparameterConfigurationSpace):
-                configuration space from where we manage our hyperparameters (individuals)
+                Configuration space from where we manage our hyperparameters (individuals)
 
             pop (list[HyperparameterConfiguration]):
                 The population which should be selected from
@@ -44,7 +44,7 @@ class Selection(ABC):
                 Number of individuals to select from the population
 
             **kwargs (dict):
-                additional parameters for the function
+                Additional parameters for the function
 
         Returns:
             tuple[list[HyperparameterConfiguration], list[float], list[HyperparameterConfiguration], list[float]]:

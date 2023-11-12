@@ -7,6 +7,7 @@ import copy
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
 
+from PyEvo.fitness import FitnessPreprocessor
 from PyEvo.selection import Selection
 from PyEvo.crossover import Crossover
 from PyEvo.mutation import Mutation
@@ -26,7 +27,8 @@ class EA:
             n_cores: int,
             seed: int,
             optimizer: str,
-            selections: Selection,
+            fitness_preprocessors: Union[FitnessPreprocessor, list[FitnessPreprocessor]],
+            selections: Union[Selection, list[Selection]],
             crossovers: Union[Crossover, list[Crossover]],
             mutations: Union[Mutation, list[Mutation]],
     ):
@@ -52,7 +54,8 @@ class EA:
         self._walltime_limit = walltime_limit
         self._random = np.random.RandomState(seed)
         self._optimizer = optimizer
-        self._selections = selections
+        self._fitness_preprocessors = fitness_preprocessors if isinstance(selections, list) else [fitness_preprocessors]
+        self._selections = selections if isinstance(selections, list) else [selections]
         self._crossovers = crossovers if isinstance(crossovers, list) else [crossovers]
         self._mutations = mutations if isinstance(mutations, list) else [mutations]
 
@@ -203,15 +206,20 @@ class EA:
             # Evaluate all genomes in the population
             fitness = self._evaluate()
             print(f"Fitness: {fitness}")
+
+            # Preprocessing of the fitness values
+            for fitness_preprocessor in self._fitness_preprocessors:
+                fitness = fitness_preprocessor.preprocess_fitness(self._random, self._cs, self._pop, fitness, self._optimizer)
+            print(f"Preprocessed Fitness: {fitness}")
             if self._check_walltime_limit():
                 return
 
             if not self._check_n_iter():
                 # Perform selection
-                pop, fitness, non_selected, fitness_non_selected = self._selections.select(self._random, self._cs,
-                                                                                           self._pop, fitness,
-                                                                                           self._optimizer,
-                                                                                           self._pop_size // self._selection_factor)
+                pop = self._pop
+                for selection in self._selections:
+                    pop, fitness, _, _ = selection.select(self._random, self._cs, pop, fitness, self._optimizer,
+                                                          len(pop) // self._selection_factor)
 
                 if self._check_walltime_limit():
                     return
