@@ -1,12 +1,12 @@
+import copy
 from abc import ABC, abstractmethod
 from typing import Union
-import numpy as np
-import copy
 
-from PyHyperparameterSpace.hp.continuous import Float, Integer
-from PyHyperparameterSpace.hp.categorical import Categorical, Binary
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
+import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
+from PyHyperparameterSpace.hp.categorical import Categorical
+from PyHyperparameterSpace.hp.continuous import Float, Integer
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
 
 class Mutation(ABC):
@@ -120,7 +120,7 @@ class GaussianMutation(Mutation):
         for ind in pop:
             for key, hp in ind.items():
                 if isinstance(cs[key], Float) and random.random() <= self._prob:
-                    if isinstance(cs, float):
+                    if isinstance(cs, (float, np.float_)):
                         ind[key] = ind[key] + self._mean + self._std * random.normal(loc=0, scale=1)
                         if ind[key] < cs[key].lb:
                             ind[key] = cs[key].lb
@@ -279,12 +279,12 @@ class UniformMutation(Mutation):
     ) -> list[HyperparameterConfiguration]:
         if self._hp_type == "float":
             hp_type = Float
-            data_type = float
+            data_type = (float, np.float_)
             sampling = random.uniform
             epsilon = 1e-10
         else:
             hp_type = Integer
-            data_type = int
+            data_type = (int, np.int_)
             sampling = random.random_integers
             epsilon = 1
 
@@ -447,7 +447,7 @@ class ChoiceMutation(Mutation):
     ) -> list[HyperparameterConfiguration]:
         for ind in pop:
             for key, hp in ind.items():
-                if isinstance(cs[key], (Categorical, Binary)) and random.random() <= self._prob:
+                if isinstance(cs[key], Categorical) and random.random() <= self._prob:
                     index = random.choice(len(cs[key].get_choices()))
                     ind[key] = np.array([cs[key].get_choices()[index]])
         return pop

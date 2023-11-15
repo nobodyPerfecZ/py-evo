@@ -1,13 +1,11 @@
 import unittest
+
 import numpy as np
-
-from PyHyperparameterSpace.configuration import HyperparameterConfiguration
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
-from PyHyperparameterSpace.hp.continuous import Float, Integer
-from PyHyperparameterSpace.hp.categorical import Categorical
 from PyHyperparameterSpace.hp.constant import Constant
+from PyHyperparameterSpace.hp.continuous import Float, Integer
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.crossover import NoCrossover, UniformCrossover, IntermediateCrossover
+from PyEvo.crossover import IntermediateCrossover, NoCrossover, UniformCrossover
 
 
 class TestNoCrossover(unittest.TestCase):

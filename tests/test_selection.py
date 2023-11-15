@@ -1,14 +1,11 @@
 import unittest
+
 import numpy as np
-
-from PyHyperparameterSpace.configuration import HyperparameterConfiguration
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
-from PyHyperparameterSpace.hp.continuous import Float, Integer
-from PyHyperparameterSpace.hp.categorical import Categorical
 from PyHyperparameterSpace.hp.constant import Constant
-from PyHyperparameterSpace.dist.continuous import Normal
+from PyHyperparameterSpace.hp.continuous import Float
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.selection import ElitistSelection, TournamentSelection, FitnessProportionalSelection
+from PyEvo.selection import ElitistSelection, FitnessProportionalSelection, TournamentSelection
 
 
 class TestElitistSelection(unittest.TestCase):

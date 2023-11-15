@@ -1,14 +1,13 @@
 import unittest
-import numpy as np
 
-from PyHyperparameterSpace.configuration import HyperparameterConfiguration
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
-from PyHyperparameterSpace.hp.continuous import Float
+import numpy as np
 from PyHyperparameterSpace.hp.categorical import Categorical
 from PyHyperparameterSpace.hp.constant import Constant
+from PyHyperparameterSpace.hp.continuous import Float
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.mutation import GaussianMutation, AdaptiveGaussianMutation, UniformMutation, AdaptiveUniformMutation, \
-    ChoiceMutation
+from PyEvo.mutation import AdaptiveGaussianMutation, AdaptiveUniformMutation, ChoiceMutation, GaussianMutation, \
+    UniformMutation
 
 
 class TestGaussianMutation(unittest.TestCase):

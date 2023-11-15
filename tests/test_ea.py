@@ -1,15 +1,15 @@
 import unittest
 
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
-from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.hp.constant import Constant
+from PyHyperparameterSpace.hp.continuous import Float
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
+from PyEvo.crossover import UniformCrossover
 from PyEvo.ea import EA
 from PyEvo.fitness import NoFitnessPreprocessing
-from PyEvo.selection import TournamentSelection
-from PyEvo.crossover import UniformCrossover
 from PyEvo.mutation import UniformMutation
+from PyEvo.selection import TournamentSelection
 
 
 class TestEA(unittest.TestCase):
@@ -57,6 +57,7 @@ class TestEA(unittest.TestCase):
         )
 
         self.cfg = HyperparameterConfiguration(
+            cs=self.cs,
             values={
                 "a": 1,
                 "b": 100,

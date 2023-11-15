@@ -1,16 +1,16 @@
-from typing import Callable, Union
-import multiprocessing
-import numpy as np
-import time
 import copy
+import multiprocessing
+import time
+from typing import Callable, Union
 
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
+import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.fitness import FitnessPreprocessor
-from PyEvo.selection import Selection
 from PyEvo.crossover import Crossover
+from PyEvo.fitness import FitnessPreprocessor
 from PyEvo.mutation import Mutation
+from PyEvo.selection import Selection
 
 
 class EA:

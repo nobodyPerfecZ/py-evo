@@ -1,7 +1,7 @@
 import copy
-import numpy as np
 from abc import ABC, abstractmethod
 
+import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 

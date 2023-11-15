@@ -1,10 +1,10 @@
 import copy
-import numpy as np
 from abc import ABC, abstractmethod
 
-from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
+import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
 from PyHyperparameterSpace.hp.continuous import Float, Integer
+from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
 
 class Crossover(ABC):
@@ -139,7 +139,7 @@ class UniformCrossover(Crossover):
                 else:
                     # Case: Select hyperparameter from parent2
                     values[key2] = value2
-            childs += [HyperparameterConfiguration(values=values)]
+            childs += [HyperparameterConfiguration(cs=cs, values=values)]
 
             # Update the index
             i = (i + 1) % (N - 1)
