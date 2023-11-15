@@ -2,12 +2,9 @@ name: Build & Test PyEvo
 
 on:
   push:
-    paths: [
-      "PyEvo",
-      "PyEvo/*",
-      "tests",
-      "tests/*"
-    ]
+    paths:
+      - "PyEvo/**"
+      - "tests/**"
 
 jobs:
   job:
