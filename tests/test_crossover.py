@@ -81,7 +81,8 @@ class TestUniformCrossover(unittest.TestCase):
         """
         Tests the method crossover().
         """
-        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.fitness, self.optimizer_min, self.n_childs)
+        new_childs = self.crossover.crossover(self.random, self.cs, self.pop, self.fitness, self.optimizer_min,
+                                              self.n_childs)
 
         self.assertEqual(self.n_childs, len(new_childs))
         self.assertNotEqual(self.pop, new_childs)
