@@ -7,10 +7,10 @@ import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.crossover import Crossover
-from PyEvo.fitness import FitnessPreprocessor
-from PyEvo.mutation import Mutation
-from PyEvo.selection import Selection
+from PyEvo.crossover.abstract_crossover import Crossover
+from PyEvo.fitness.abstract_preprocessor import FitnessPreprocessor
+from PyEvo.mutation.abstract_mutation import Mutation
+from PyEvo.selection.abstract_selection import Selection
 
 
 class EA:

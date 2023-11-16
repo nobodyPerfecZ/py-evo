@@ -5,11 +5,11 @@ from PyHyperparameterSpace.hp.constant import Constant
 from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.crossover import UniformCrossover
+from PyEvo.crossover.uniform import UniformCrossover
 from PyEvo.ea import EA
-from PyEvo.fitness import NoFitnessPreprocessing
-from PyEvo.mutation import UniformMutation
-from PyEvo.selection import TournamentSelection
+from PyEvo.fitness.no_preprocessing import NoFitnessPreprocessing
+from PyEvo.mutation.uniform import UniformMutation
+from PyEvo.selection.tournament import TournamentSelection
 
 
 class TestEA(unittest.TestCase):
