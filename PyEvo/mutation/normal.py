@@ -15,13 +15,13 @@ class GaussianMutation(Mutation):
 
         Args:
             mean (float):
-                Mu of the normal distribution N(mu, sigma)
+                Mean of the normal distribution N(mean, std)
 
             std (float):
-                Sigma of the normal distribution N(mu, sigma)
+                Standard deviation of the normal distribution N(mean, std)
 
             prob (float):
-                Probability that the mutation occurs
+                Mutation Probability that the mutation occurs
     """
 
     def __init__(self, mean: float, std: float, prob: float):
@@ -51,7 +51,23 @@ class GaussianMutation(Mutation):
 
 class DecayGaussianMutation(GaussianMutation, ABC):
     """
-    TODO: Add Documentation
+    A mutation class that applies Gaussian mutation with a decaying standard deviation.
+
+    This class inherits from GaussianMutation and is designed for mutation operations
+    where the standard deviation of the Gaussian distribution decreases over time.
+
+        Args:
+            mean (float):
+                The mean value of the normal distribution N(mean, std)
+
+            min_std (float):
+                The minimum standard deviation after decay is finished
+
+            max_std (float):
+                The maximum standard deviation before decay is starting
+
+            prob (float):
+                Mutation Probability that the mutation occurs
     """
 
     def __init__(self, mean: float, min_std: float, max_std: float, prob: float):
@@ -65,7 +81,7 @@ class DecayGaussianMutation(GaussianMutation, ABC):
     @abstractmethod
     def _update(self):
         """
-        TODO: Add Documentation
+        Updates the current standard deviation (_std) after the decay method.
         """
         pass
 
@@ -85,7 +101,32 @@ class DecayGaussianMutation(GaussianMutation, ABC):
 
 class LinearDecayGaussianMutation(DecayGaussianMutation):
     """
-    # TODO: Add Documentation
+    A mutation class that applies Gaussian mutation with a linearly decaying standard deviation.
+
+    This class inherits from DecayGaussianMutation and is specifically tailored for mutation
+    operations where the standard deviation of the Gaussian distribution decreases linearly over time.
+
+    Linear Decaying of the standard deviation is defined as follows:
+
+        momentum := (std_max - std_min) / (#steps)
+
+        std_t+1 := std_t - momentum
+
+        Args:
+            mean (float):
+                The mean value of the normal distribution N(mean, std)
+
+            min_std (float):
+                The minimum standard deviation after decay is finished
+
+            max_std (float):
+                The maximum standard deviation before decay is starting
+
+            prob (float):
+                Mutation Probability that the mutation occurs
+
+            steps (float):
+                Number of times to call the mutation before reaching the minimum standard deviation
     """
 
     def __init__(self, mean: float, min_std: float, max_std: float, prob: float, steps: float):
@@ -100,7 +141,33 @@ class LinearDecayGaussianMutation(DecayGaussianMutation):
 
 class EpsilonDecayGaussianMutation(DecayGaussianMutation):
     """
-    TODO: Add Documentation + Unittests
+    A mutation class that applies Gaussian mutation with an epsilon-decaying standard deviation.
+
+    This class inherits from DecayGaussianMutation and is designed for mutation operations
+    where the standard deviation of the Gaussian distribution decreases with a minimum value (epsilon) over time.
+
+     Epsilon Decaying of the standard deviation is defined as follows:
+
+        decay_factor := sqrt_#steps(std_min / std_max)
+
+        std_t+1 := std_t * decay_factor
+
+        Args:
+            mean (float):
+                The mean value of the normal distribution N(mean, std)
+
+            min_std (float):
+                The minimum standard deviation after decay is finished
+
+            max_std (float):
+                The maximum standard deviation before decay is starting
+
+            prob (float):
+                Mutation Probability that the mutation occurs
+
+            steps (float):
+                Number of times to call the mutation before reaching the minimum standard deviation
+
     """
 
     def __init__(self, mean: float, min_std: float, max_std: float, prob: float, steps: float):
