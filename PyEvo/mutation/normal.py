@@ -73,6 +73,8 @@ class DecayGaussianMutation(GaussianMutation, ABC):
     def __init__(self, mean: float, min_std: float, max_std: float, prob: float):
         assert max_std > 0.0, f"Illegal max_std {max_std}. The argument should be higher than 0.0!"
         assert min_std > 0.0, f"Illegal min_std {min_std}. The argument should be higher than 0.0!"
+        assert min_std < max_std, f"Illegal min_std {min_std} or max_std {max_std}. " \
+                                  f"The argument should satisfy the constraint min_std < max_std"
 
         super().__init__(mean, max_std, prob)
         self._min_std = min_std
