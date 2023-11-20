@@ -53,7 +53,7 @@ class TestEA(unittest.TestCase):
             fitness_preprocessors=NoFitnessPreprocessing(),
             selections=TournamentSelection(),
             crossovers=UniformCrossover(),
-            mutations=UniformMutation(low=-0.5, high=0.5, hp_type="float", prob=1.0),
+            mutations=UniformMutation(low=-0.5, high=0.5, prob=1.0),
         )
 
         self.cfg = HyperparameterConfiguration(
