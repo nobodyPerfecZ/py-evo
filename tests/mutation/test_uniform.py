@@ -5,7 +5,7 @@ from PyHyperparameterSpace.hp.constant import Constant
 from PyHyperparameterSpace.hp.continuous import Float
 from PyHyperparameterSpace.space import HyperparameterConfigurationSpace
 
-from PyEvo.mutation.uniform import UniformMutation, LinearDecayUniformMutation, EpsilonDecayUniformMutation
+from PyEvo.mutation.uniform import EpsilonDecayUniformMutation, LinearDecayUniformMutation, UniformMutation
 
 
 class TestUniformMutation(unittest.TestCase):

@@ -1,5 +1,5 @@
-from typing import Union
 from abc import ABC, abstractmethod
+from typing import Union
 
 import numpy as np
 from PyHyperparameterSpace.configuration import HyperparameterConfiguration
@@ -31,6 +31,7 @@ class UniformMutation(Mutation):
         assert high > 0, f"Illegal high {high}. The argument should be higher than 0!"
         assert low < high, f"Illegal low {low} or high {high}. The arguments should satisfy the constraint low < high!"
         super().__init__(prob)
+
         self._low = low
         self._high = high
 
@@ -97,6 +98,7 @@ class DecayUniformMutation(UniformMutation, ABC):
         assert max_high > 0, f"Illegal max_high {max_high}. The argument should be higher than 0!"
         assert min_low < max_low < min_high < max_high, f"Illegal min_low {min_low}, max_low {max_low}, min_high {min_high} or max_high {max_high}. The arguments should satisfy the constraint min_low < max_low < min_high < max_high!"
         super().__init__(min_low, max_high, prob)
+
         self._min_low = min_low
         self._max_low = max_low
         self._min_high = min_high
@@ -167,6 +169,7 @@ class LinearDecayUniformMutation(DecayUniformMutation):
     ):
         assert steps > 0, f"Illegal steps {steps}. The argument should be higher than 0!"
         super().__init__(min_low, max_low, min_high, max_high, prob)
+
         self._steps = steps
 
         self._low_momentum = (self._min_low - self._max_low) / self._steps
@@ -219,8 +222,8 @@ class EpsilonDecayUniformMutation(DecayUniformMutation):
             steps: int,
     ):
         assert steps > 0, f"Illegal steps {steps}. The argument should be higher than 0!"
-
         super().__init__(min_low, max_low, min_high, max_high, prob)
+
         self._steps = steps
 
         self._low_decay = (self._max_low / self._min_low) ** (1 / self._steps)
